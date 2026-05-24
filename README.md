@@ -3,7 +3,7 @@
 MCP (Model Context Protocol) server that gives Claude visual feedback when writing LVGL UI code for ESP32. It compiles C code snippets in a headless LVGL simulator on Windows, captures a PNG screenshot and a JSON widget tree, and returns them through the MCP protocol. No hardware, no flashing, no SDL window needed.
 
 ```
-┌─────────────┐     stdio (JSON-RPC)    ┌──────────────────┐
+┌─────────────┐ stdio or HTTP (MCP)     ┌──────────────────┐
 │  Claude Code │◄───────────────────────►│  MCP Server      │
 │  (client)    │                         │  (Node.js)       │
 └─────────────┘                          └────────┬─────────┘
@@ -37,6 +37,50 @@ Add to your Claude Code config (`.claude/settings.json` or global settings):
 ```
 
 Done. Claude now has `lvgl_render`, `lvgl_render_full`, `lvgl_inspect`, and other LVGL tools.
+
+## Transports
+
+The default transport is still stdio, which keeps compatibility with Claude Code and MCP Inspector:
+
+```powershell
+lvgl-mcp-server
+# equivalent:
+lvgl-mcp-server --transport stdio
+```
+
+This fork also supports MCP Streamable HTTP for remote clients such as an agent running in a Linux VM/LXC while the LVGL simulator runs on Windows:
+
+```powershell
+lvgl-mcp-server --transport http --host 127.0.0.1 --port 3333 --path /mcp
+```
+
+Health check:
+
+```powershell
+curl http://127.0.0.1:3333/health
+```
+
+Environment variable equivalents:
+
+```text
+LVGL_MCP_TRANSPORT=http
+LVGL_MCP_HOST=127.0.0.1
+LVGL_MCP_PORT=3333
+LVGL_MCP_PATH=/mcp
+LVGL_MCP_AUTH_TOKEN=optional-bearer-token
+```
+
+Security note: keep the HTTP server bound to `127.0.0.1` by default. The server compiles and runs LVGL C snippets, so do not expose it to a LAN without a tunnel/firewall and an auth token. For remote access from another machine, prefer an SSH tunnel first.
+
+Hermes Agent example using native MCP over HTTP:
+
+```yaml
+mcp_servers:
+  lvgl:
+    url: "http://127.0.0.1:3333/mcp"
+    timeout: 180
+    connect_timeout: 60
+```
 
 ### Prerequisites
 
