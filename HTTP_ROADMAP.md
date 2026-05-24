@@ -4,6 +4,7 @@ This fork added Streamable HTTP support while preserving stdio as the default tr
 
 ## Principles
 
+- Read `RENDERING_FIDELITY_CHECKLIST.md` before treating MCP screenshots as evidence. The server is a desktop LVGL renderer, not a CoreS3 / ESP32-S3 emulator.
 - Keep `stdio` as the default transport for compatibility with MCP Inspector, Claude Code, and the original upstream behavior.
 - Keep HTTP as MCP Streamable HTTP, not a custom REST `/render` API.
 - Keep the server generic. Power Sentinel-specific fixtures, scripts, and workflows belong in the Power Sentinel repo.
