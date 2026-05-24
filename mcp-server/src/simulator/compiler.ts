@@ -176,6 +176,7 @@ export class SimulatorCompiler {
    */
   async compile(userCode: string, isFullFile: boolean): Promise<CompileResult> {
     // Write user code
+    await fs.mkdir(this.config.buildDir, { recursive: true });
     const codePath = path.join(this.config.buildDir, "user_code.c");
 
     if (isFullFile) {
